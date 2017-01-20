@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>PUBSUB</title>
+</head>
+<body>
+	<h1>Publisher and Subscriber Module</h1>
+	<div id="addCnt"></div>
+	<p>
+		<label for="addText">Add Text : </label>
+		<input type="text" id="addText" />
+	</p>
+	<hr />
+	<p>
+		<label for="updateText">Update Text</label>
+		<input type="text" id="existingText">
+		<input type="text" id="updateText">
+	</p>
+
+	<button id="add">Add Topic</button>
+	<button id="up">Update Topic</button>
+</body>
+<script src="pubsub.js"></script>
+<script>
+	(function(){
+
+		var topics = {
+			topicsArr: [],
+			add: function(eventName, data){
+				// console.log('on add');
+				topics.topicsArr.push(data);
+				var p = document.createElement("p")
+				p.innerHTML = data;
+				document.querySelector("#addCnt").appendChild(p);
+			},
+			delete: function(eventName, data){
+				// console.log('on event');
+				topics.topicsArr.pop(data);
+			},
+			update: function(eventName, data){
+				// console.log('on update');
+				var ix = topics.topicsArr.indexOf(data.extx)
+				topics.topicsArr.splice(ix, 0, data.uptx);
+
+				var p = document.createElement("p")
+				p.innerHTML = topics.topicsArr[ix];
+
+				document.querySelector("#addCnt").innerHTML = "";
+				document.querySelector("#addCnt").appendChild(p);
+			},
+			listen: function(){
+				console.log( topics.topicsArr, topics.topicsArr.length );
+			},
+			clearText: function(){
+				document.querySelector("#add").value = "";
+				document.querySelector("#existingText").value = "";
+				document.querySelector("#updateText").value = "";
+			}
+		};
+
+		PubSub.subscribe('tps.update', topics.update);
+		PubSub.subscribe('tps.add', topics.add);
+
+		document.querySelector("#add").addEventListener('click', function(){
+
+			var tx = document.querySelector("#addText").value;
+			PubSub.publish('tps.add', tx);
+
+		}, false);
+
+		document.querySelector("#up").addEventListener('click', function(){
+
+			var extx = document.querySelector("#existingText").value;
+			var uptx = document.querySelector("#updateText").value;
+
+			PubSub.publish('tps.update', {extx, uptx});
+
+		}, false);
+
+
+	})();
+</script>
+</html>
